@@ -409,7 +409,7 @@ const Billing = ({ clients = [], onRefresh }) => {
             <div className="stat-card revenue">
               <div className="stat-icon">💰</div>
               <div className="stat-content">
-                <h3>{invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.amount, 0).toLocaleString('fr-FR')} €</h3>
+                <h3>{invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.amount, 0).toLocaleString('fr-FR')} € TTC</h3>
                 <p>Chiffre d'affaires</p>
                 <span className="stat-trend">Factures payées</span>
               </div>
@@ -418,7 +418,7 @@ const Billing = ({ clients = [], onRefresh }) => {
             <div className="stat-card pending">
               <div className="stat-icon">⏳</div>
               <div className="stat-content">
-                <h3>{invoices.filter(inv => inv.status === 'pending').reduce((sum, inv) => sum + inv.amount, 0).toLocaleString('fr-FR')} €</h3>
+                <h3>{invoices.filter(inv => inv.status === 'pending').reduce((sum, inv) => sum + inv.amount, 0).toLocaleString('fr-FR')} € TTC</h3>
                 <p>En attente</p>
                 <span className="stat-trend">À encaisser</span>
               </div>
@@ -427,7 +427,7 @@ const Billing = ({ clients = [], onRefresh }) => {
             <div className="stat-card overdue">
               <div className="stat-icon">⚠️</div>
               <div className="stat-content">
-                <h3>{invoices.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + inv.amount, 0).toLocaleString('fr-FR')} €</h3>
+                <h3>{invoices.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + inv.amount, 0).toLocaleString('fr-FR')} € TTC</h3>
                 <p>En retard</p>
                 <span className="stat-trend">Relances nécessaires</span>
               </div>
@@ -624,7 +624,7 @@ const Billing = ({ clients = [], onRefresh }) => {
                   </div>
 
                   <div className="invoice-amount">
-                    <span className="amount-label">Montant :</span>
+                    <span className="amount-label">Montant TTC :</span>
                     <span className="amount-value">{invoice.amount.toFixed(2)} €</span>
                   </div>
 
