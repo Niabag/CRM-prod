@@ -5,6 +5,10 @@ import { API_ENDPOINTS, apiRequest } from "../config/api";
 export const DEFAULT_TRIAL_DAYS =
   parseInt(import.meta.env.VITE_TRIAL_PERIOD_DAYS, 10) || 14;
 
+// Subscription price in euros
+export const SUBSCRIPTION_PRICE =
+  parseFloat(import.meta.env.VITE_SUBSCRIPTION_PRICE) || 13;
+
 // Constants
 export const SUBSCRIPTION_STATUS = {
   ACTIVE: 'active',

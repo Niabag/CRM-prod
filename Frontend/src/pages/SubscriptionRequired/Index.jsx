@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getSubscriptionStatus, createCheckoutSession, startFreeTrial, SUBSCRIPTION_STATUS, DEFAULT_TRIAL_DAYS } from '../../services/subscription';
+import { getSubscriptionStatus, createCheckoutSession, startFreeTrial, SUBSCRIPTION_STATUS, DEFAULT_TRIAL_DAYS, SUBSCRIPTION_PRICE } from '../../services/subscription';
 import Navbar from '../../components/Navbar';
 import './SubscriptionRequired.scss';
 
@@ -132,7 +132,7 @@ const SubscriptionRequired = () => {
               <div className="subscription-badge">Offre Unique</div>
               <h2 className="subscription-title">Abonnement Pro</h2>
               <div className="subscription-price">
-                <span className="price-amount">13€</span>
+                <span className="price-amount">{SUBSCRIPTION_PRICE}€</span>
                 <span className="price-period">/mois</span>
               </div>
               <p className="subscription-description">
