@@ -1,19 +1,22 @@
-import express from 'express';
-import { Client } from '../models/Client.js';
-import { Service } from '../models/Service.js';
-import { Appointment } from '../models/Appointment.js';
-import authMiddleware from '../middleware/auth.js';
-import { checkSubscription } from '../middleware/subscription.js';
+const express = require('express');
+const Client = require('../models/client');
+const { Service } = require('../models/Service.js');
+const { Appointment } = require('../models/Appointment.js');
+const authMiddleware = require('../middleware/auth');
+const { checkSubscription } = require('../middleware/subscription');
 
 const router = express.Router();
 
 // Récupérer les statistiques du tableau de bord
 router.get('/', authMiddleware, checkSubscription, async (req, res) => {
   try {
+    const userId = req.userId;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const clientIds = await Client.find({ userId }).distinct('_id');
 
     const [
       totalClients,
@@ -24,20 +27,22 @@ router.get('/', authMiddleware, checkSubscription, async (req, res) => {
       completedAppointments,
       cancelledAppointments
     ] = await Promise.all([
-      Client.countDocuments(),
+      Client.countDocuments({ userId }),
       Service.countDocuments(),
-      Appointment.countDocuments(),
-      Appointment.countDocuments({ 
-        start: { $gte: today, $lt: tomorrow } 
+      Appointment.countDocuments({ clientId: { $in: clientIds } }),
+      Appointment.countDocuments({
+        clientId: { $in: clientIds },
+        start: { $gte: today, $lt: tomorrow }
       }),
-      Appointment.countDocuments({ status: 'confirmed' }),
-      Appointment.countDocuments({ status: 'completed' }),
-      Appointment.countDocuments({ status: 'cancelled' })
+      Appointment.countDocuments({ clientId: { $in: clientIds }, status: 'confirmed' }),
+      Appointment.countDocuments({ clientId: { $in: clientIds }, status: 'completed' }),
+      Appointment.countDocuments({ clientId: { $in: clientIds }, status: 'cancelled' })
     ]);
 
-    // Calculer le chiffre d'affaires des rendez-vous terminés
-    const completedAppointmentsWithServices = await Appointment.find({ 
-      status: 'completed' 
+    // Calculer le chiffre d'affaires des rendez-vous terminés pour cet utilisateur
+    const completedAppointmentsWithServices = await Appointment.find({
+      clientId: { $in: clientIds },
+      status: 'completed'
     }).populate('serviceId', 'price');
     
     const totalRevenue = completedAppointmentsWithServices.reduce((sum, apt) => {
@@ -49,6 +54,7 @@ router.get('/', authMiddleware, checkSubscription, async (req, res) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     const recentAppointments = await Appointment.countDocuments({
+      clientId: { $in: clientIds },
       start: { $gte: thirtyDaysAgo }
     });
     
@@ -76,6 +82,8 @@ router.get('/period/:period', authMiddleware, checkSubscription, async (req, res
   try {
     const { period } = req.params;
     const now = new Date();
+    const userId = req.userId;
+    const clientIds = await Client.find({ userId }).distinct('_id');
     let startDate;
 
     switch (period) {
@@ -96,6 +104,7 @@ router.get('/period/:period', authMiddleware, checkSubscription, async (req, res
     }
 
     const appointments = await Appointment.find({
+      clientId: { $in: clientIds },
       start: { $gte: startDate, $lte: now }
     }).populate('serviceId', 'price');
 
@@ -120,4 +129,4 @@ router.get('/period/:period', authMiddleware, checkSubscription, async (req, res
   }
 });
 
-export default router;
+module.exports = router;
