@@ -564,8 +564,8 @@ const DynamicInvoice = ({
           💾 Enregistrer
         </button>
         {onCancel && (
-          <button onClick={onCancel} className="invoice-action-btn cancel-btn">
-            ✕ Annuler
+          <button onClick={onCancel} className="invoice-action-btn cancel-btn" title="Annuler">
+            ✕
           </button>
         )}
       </div>
