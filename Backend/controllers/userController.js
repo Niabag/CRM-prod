@@ -29,20 +29,31 @@ exports.register = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    const newUser = new User({ 
-      name: name.trim(), 
-      email: email.toLowerCase().trim(), 
-      password: hashedPassword 
+    const newUser = new User({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      password
     });
     
     await newUser.save();
 
+    // Generate JWT token for immediate authentication after registration
+    const token = jwt.sign(
+      { userId: newUser._id },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
     console.log("✅ Nouvel utilisateur créé:", newUser.email);
-    res.status(201).json({ 
-      message: "Utilisateur inscrit avec succès",
-      userId: newUser._id 
+    // Return same structure as login so frontend can store token
+    res.status(201).json({
+      userId: newUser._id,
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email
+      }
     });
   } catch (error) {
     console.error("❌ Erreur lors de l'inscription:", error);
