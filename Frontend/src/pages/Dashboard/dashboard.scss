@@ -1,9 +1,10 @@
 /* ✅ NOUVEAU DESIGN DASHBOARD PROFESSIONNEL */
 .dashboard-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   background: #f8fafc;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   flex-direction: row; /* Assurez-vous que la direction est en ligne */
 }
 
