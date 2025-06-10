@@ -142,6 +142,45 @@ const ClientBilling = ({ client, onBack }) => {
     alert("✅ Facture créée avec succès !");
   };
 
+  // Changer le statut d'un devis depuis la facturation client
+  const handleDevisStatusClick = async (devisId, currentStatus) => {
+    let newStatus;
+
+    // Cycle: nouveau -> en_attente -> fini -> inactif -> nouveau
+    switch (currentStatus) {
+      case 'nouveau':
+        newStatus = 'en_attente';
+        break;
+      case 'en_attente':
+        newStatus = 'fini';
+        break;
+      case 'fini':
+        newStatus = 'inactif';
+        break;
+      case 'inactif':
+        newStatus = 'nouveau';
+        break;
+      default:
+        newStatus = 'en_attente';
+    }
+
+    setLoading(true);
+    try {
+      await apiRequest(API_ENDPOINTS.DEVIS.UPDATE_STATUS(devisId), {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      await fetchClientData();
+      console.log(`✅ Statut du devis mis à jour: ${currentStatus} → ${newStatus}`);
+    } catch (err) {
+      console.error('Erreur changement statut devis:', err);
+      alert(`❌ Erreur lors du changement de statut: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDownloadPDF = async (devis) => {
     try {
       setLoading(true);
@@ -601,7 +640,7 @@ const ClientBilling = ({ client, onBack }) => {
                       title={`Cliquer pour changer le statut`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Ici, vous ajouteriez la logique pour changer le statut
+                        handleDevisStatusClick(devis._id, devis.status);
                       }}
                     >
                       {getDevisStatusIcon(devis.status)}
