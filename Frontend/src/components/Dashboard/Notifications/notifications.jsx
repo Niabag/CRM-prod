@@ -850,13 +850,6 @@ const Notifications = ({ onNotificationsUpdate }) => {
     setAutoRefreshEnabled(!autoRefreshEnabled);
   };
 
-  const handleClearAllDeleted = () => {
-    if (window.confirm("Voulez-vous réinitialiser la liste des notifications supprimées ? Cela pourrait faire réapparaître d'anciennes notifications lors de la prochaine actualisation.")) {
-      setDeletedNotificationIds([]);
-      localStorage.removeItem('deletedNotificationIds');
-      alert("Liste des notifications supprimées réinitialisée");
-    }
-  };
 
   if (loading && notifications.length === 0) {
     return (
@@ -952,9 +945,6 @@ const Notifications = ({ onNotificationsUpdate }) => {
         </div>
 
         <div className="actions-section">
-          <button onClick={handleRefresh} className="action-btn refresh-btn">
-            🔄 Actualiser
-          </button>
           
           {unreadCount > 0 && (
             <button onClick={markAllAsRead} className="action-btn mark-all-read">
@@ -973,11 +963,6 @@ const Notifications = ({ onNotificationsUpdate }) => {
             </>
           )}
           
-          {deletedNotificationIds.length > 0 && (
-            <button onClick={handleClearAllDeleted} className="action-btn reset-deleted">
-              🔄 Réinitialiser suppressions ({deletedNotificationIds.length})
-            </button>
-          )}
         </div>
       </div>
 
@@ -1007,9 +992,6 @@ const Notifications = ({ onNotificationsUpdate }) => {
                 : "Vous n'avez aucune notification pour le moment"
               }
             </p>
-            <button onClick={handleRefresh} className="action-link">
-              Actualiser les notifications
-            </button>
           </div>
         ) : (
           filteredNotifications.map(notification => (
