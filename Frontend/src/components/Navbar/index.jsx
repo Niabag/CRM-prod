@@ -139,9 +139,12 @@ const Navbar = () => {
                   <span className="user-name">{user?.name || "Utilisateur"}</span>
                   <span className="user-email">{user?.email || ""}</span>
                 </div>
-                
+
                 {/* Menu utilisateur */}
-                <div className={`user-menu ${isUserMenuOpen ? 'active' : ''}`}>
+                <div
+                  className={`user-menu ${isUserMenuOpen ? 'active' : ''}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="user-menu-header">
                     <div className="menu-avatar">
                       {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
