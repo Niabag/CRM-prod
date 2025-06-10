@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS, apiRequest } from '../../../config/api';
 import './prospects.scss';
 
-const ProspectsPage = ({ clients = [], onRefresh, onViewClientDevis, onEditProspect, onViewClientBilling }) => {
+const ProspectsPage = ({ clients = [], onRefresh, onViewClientDevis, onEditProspect, onViewClientBilling, onCreateProspect }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -389,8 +389,8 @@ const ProspectsPage = ({ clients = [], onRefresh, onViewClientDevis, onEditProsp
               </button>
             )}
             
-            <button 
-              onClick={() => navigate("/register-client/" + userId)}
+            <button
+              onClick={onCreateProspect}
               className="cta-button"
             >
               ✨ Créer un prospect
