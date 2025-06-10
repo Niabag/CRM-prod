@@ -523,24 +523,6 @@ const BusinessCard = ({ userId, user }) => {
                 <p className="save-status">✅ Image sauvegardée en base de données</p>
               )}
               
-              <div className="download-buttons">
-                <button 
-                  onClick={downloadCardImageOnly}
-                  className="download-image-btn"
-                  disabled={loading}
-                  title="Télécharger le template seul"
-                >
-                  📷 Template seul
-                </button>
-                <button 
-                  onClick={downloadBusinessCard}
-                  className="download-with-qr-btn"
-                  disabled={loading}
-                  title="Télécharger la carte complète"
-                >
-                  📥 Carte complète
-                </button>
-              </div>
             </div>
 
             <div className="form-group">
