@@ -30,6 +30,7 @@ const Dashboard = () => {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [selectedProspect, setSelectedProspect] = useState(null);
   const userMenuRef = useRef(null);
+  const socketRef = useRef(null);
 
   // Fermer le menu utilisateur quand on clique ailleurs
   useEffect(() => {
@@ -159,6 +160,52 @@ const Dashboard = () => {
   // Mettre à jour le compteur au chargement
   useEffect(() => {
     updateUnreadNotifications();
+  }, []);
+
+  // Connexion en temps réel pour mettre à jour les notifications
+  useEffect(() => {
+    const connectSocket = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const decoded = decodeToken(token);
+      if (!decoded || !decoded.userId) return;
+
+      try {
+        const { io } = await import('socket.io-client');
+        const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+        const socket = io(SOCKET_URL, { withCredentials: true, transports: ['websocket'] });
+        socketRef.current = socket;
+
+        socket.on('connect', () => {
+          socket.emit('authenticate', decoded.userId);
+        });
+
+        socket.on('notification', (notification) => {
+          let stored = localStorage.getItem('notificationsData');
+          let notifications = [];
+          if (stored) {
+            try { notifications = JSON.parse(stored); } catch (e) { notifications = []; }
+          }
+          const notifWithId = { ...notification, id: notification.id || `${notification.type}_${notification.category}_${Date.now()}` };
+          notifications = [notifWithId, ...notifications];
+          localStorage.setItem('notificationsData', JSON.stringify(notifications));
+          const unreadCount = notifications.filter(n => !n.read).length;
+          setUnreadNotifications(unreadCount);
+        });
+      } catch (err) {
+        console.error('Erreur lors de la connexion au socket:', err);
+      }
+    };
+
+    connectSocket();
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
   }, []);
 
   // Gérer l'édition d'un prospect
