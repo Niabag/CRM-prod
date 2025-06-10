@@ -41,7 +41,16 @@ io.on("connection", (socket) => {
   socket.on("authenticate", (userId) => {
     if (userId) {
       console.log(`✅ Utilisateur ${userId} authentifié sur socket ${socket.id}`);
-      // Stocker la connexion de l'utilisateur
+      // Déconnecter l'ancienne connexion si elle existe
+      const previousSocketId = userConnections.get(userId);
+      if (previousSocketId && previousSocketId !== socket.id) {
+        const previousSocket = io.sockets.sockets.get(previousSocketId);
+        if (previousSocket) {
+          previousSocket.disconnect(true);
+        }
+      }
+
+      // Stocker la nouvelle connexion de l'utilisateur
       userConnections.set(userId, socket.id);
       // Rejoindre une room spécifique à l'utilisateur
       socket.join(`user-${userId}`);
