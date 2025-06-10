@@ -370,19 +370,35 @@ const trackCardView = async (req, res) => {
   const lastViewed = businessCard.stats.lastViewed
       ? new Date(businessCard.stats.lastViewed)
       : null;
-  const isDuplicate = lastViewed && (now - lastViewed < 30000); // 30s
+  const threshold = new Date(now.getTime() - 30000); // 30s
+  const isDuplicate = lastViewed && lastViewed >= threshold;
 
-  const update = { $set: { 'stats.lastViewed': now } };
+  let updatedCard;
   if (!isDuplicate) {
-    update.$inc = { 'stats.views': 1 };
-    update.$push = { 'stats.viewDates': now };
+    updatedCard = await BusinessCard.findOneAndUpdate(
+      {
+        userId,
+        $or: [
+          { 'stats.lastViewed': { $exists: false } },
+          { 'stats.lastViewed': { $lt: threshold } }
+        ]
+      },
+      {
+        $set: { 'stats.lastViewed': now },
+        $inc: { 'stats.views': 1 },
+        $push: { 'stats.viewDates': now }
+      },
+      { new: true }
+    );
   }
 
-  const updatedCard = await BusinessCard.findOneAndUpdate(
-    { userId },
-    update,
-    { new: true }
-  );
+  if (!updatedCard) {
+    updatedCard = await BusinessCard.findOneAndUpdate(
+      { userId },
+      { $set: { 'stats.lastViewed': now } },
+      { new: true }
+    );
+  }
 
   console.log("✅ Vue de carte enregistrée, total:", updatedCard.stats.views);
     
