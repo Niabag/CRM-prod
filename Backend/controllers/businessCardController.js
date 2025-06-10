@@ -350,6 +350,7 @@ const updateCardConfig = async (req, res) => {
 const trackCardView = async (req, res) => {
   try {
     const { userId } = req.params;
+    const now = new Date();
     
     console.log("👁️ Suivi d'une vue de carte pour userId:", userId);
     
@@ -360,23 +361,27 @@ const trackCardView = async (req, res) => {
       return res.status(404).json({ message: "Aucune carte de visite trouvée pour cet utilisateur" });
     }
     
-    // Créer ou mettre à jour les statistiques
+    // Créer les statistiques si elles n'existent pas
     if (!businessCard.stats) {
-      businessCard.stats = {
-        views: 1,
-        lastViewed: new Date(),
-        viewDates: [new Date()]
-      };
-    } else {
+      businessCard.stats = { views: 0, lastViewed: null, viewDates: [] };
+    }
+
+    const lastViewed = businessCard.stats.lastViewed
+      ? new Date(businessCard.stats.lastViewed)
+      : null;
+    const isDuplicate = lastViewed && (now - lastViewed < 30000); // 30s
+
+    if (!isDuplicate) {
       businessCard.stats.views = (businessCard.stats.views || 0) + 1;
-      businessCard.stats.lastViewed = new Date();
-      
+
       if (!Array.isArray(businessCard.stats.viewDates)) {
         businessCard.stats.viewDates = [];
       }
-      
-      businessCard.stats.viewDates.push(new Date());
+
+      businessCard.stats.viewDates.push(now);
     }
+
+    businessCard.stats.lastViewed = now;
     
     await businessCard.save();
     
@@ -384,14 +389,15 @@ const trackCardView = async (req, res) => {
     
     // ✅ NOUVEAU: Envoyer une notification en temps réel
     const io = req.app.get("io");
-    if (io) {
+    if (io && !isDuplicate) {
       io.to(`user-${userId}`).emit("notification", {
+        id: `card_scan_${Date.now()}`,
         type: "system",
         category: "card_scan",
         title: "Nouvelle vue de votre carte",
         message: "Quelqu'un vient de scanner votre QR code",
-        details: `Date: ${new Date().toLocaleString('fr-FR')}`,
-        date: new Date(),
+        details: `Date: ${now.toLocaleString('fr-FR')}`,
+        date: now,
         read: false
       });
       console.log(`✅ Notification de scan de carte envoyée à l'utilisateur ${userId}`);
