@@ -370,19 +370,6 @@ const Dashboard = () => {
                 🏠 Accueil
               </button>
               
-              <button
-                className="header-btn primary"
-                onClick={() => {
-                  if (activeTab === "devis") {
-                    handleCreateNewDevis();
-                  } else if (activeTab === "clients") {
-                    // Ajouter un nouveau prospect
-                    handleCreateProspect();
-                  }
-                }}
-              >
-                ✨ {activeTab === "devis" ? "Nouveau devis" : activeTab === "clients" ? "Nouveau prospect" : "Nouvelle action"}
-              </button>
             </div>
             
             <div className="user-profile" onClick={toggleUserMenu} ref={userMenuRef}>
