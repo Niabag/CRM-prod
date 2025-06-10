@@ -77,7 +77,7 @@ const RegisterClient = () => {
         setBusinessCard(response.businessCard);
         
         if (response.businessCard.cardConfig && response.businessCard.cardConfig.actions) {
-          await executeActions(response.businessCard.cardConfig.actions);
+          await executeActions(response.businessCard.cardConfig.actions, response.businessCard);
         } else {
           console.log('Aucune action configurée - Affichage du formulaire par défaut');
           setShowForm(true);
@@ -95,7 +95,7 @@ const RegisterClient = () => {
     }
   };
 
-  const executeActions = async (actions) => {
+  const executeActions = async (actions, cardData) => {
     if (!actions || actions.length === 0) {
       console.log('Aucune action - Formulaire par défaut');
       setShowForm(true);
@@ -174,7 +174,7 @@ const RegisterClient = () => {
         break;
       
       case 'card-download':
-        await executeCardDownloadSchema(sortedActions);
+        await executeCardDownloadSchema(sortedActions, cardData);
         break;
       
       default:
@@ -351,7 +351,7 @@ const RegisterClient = () => {
   };
 
   // SCHÉMA 7: Carte de Visite (download seulement)
-  const executeCardDownloadSchema = async (actions) => {
+  const executeCardDownloadSchema = async (actions, cardData) => {
     console.log('📥 Exécution: Carte de Visite');
     const downloadAction = actions.find(a => a.type === 'download');
     
@@ -363,7 +363,7 @@ const RegisterClient = () => {
       }]);
       
       setTimeout(async () => {
-        await handleDownloadAction(downloadAction);
+        await handleDownloadAction(downloadAction, cardData);
       }, 1000);
     }
   };
@@ -396,7 +396,7 @@ const RegisterClient = () => {
       await new Promise(resolve => setTimeout(resolve, action.delay || 1000));
 
       if (action.type === 'download') {
-        await handleDownloadAction(action);
+        await handleDownloadAction(action, businessCard);
       } else if (action.type === 'website') {
         window.open(action.url, '_blank');
         setExecutionStatus(prev => [...prev, {
@@ -410,7 +410,7 @@ const RegisterClient = () => {
     setPendingActions([]);
   };
 
-  const handleDownloadAction = async (action) => {
+  const handleDownloadAction = async (action, card = businessCard) => {
     try {
       setExecutionStatus(prev => [...prev, {
         action: 'download',
@@ -421,7 +421,7 @@ const RegisterClient = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Télécharger l'image de la carte de visite avec QR code intégré
-      if (businessCard && businessCard.cardImage) {
+      if (card && card.cardImage) {
         // Créer un canvas pour intégrer le QR code sur l'image
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -439,10 +439,10 @@ const RegisterClient = () => {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           
           // Ajouter le QR code si configuré
-          if (businessCard.cardConfig && businessCard.cardConfig.showQR) {
+          if (card.cardConfig && card.cardConfig.showQR) {
             // Générer le QR code
-            const qrSize = businessCard.cardConfig.qrSize || 120;
-            const position = businessCard.cardConfig.qrPosition || 'top-right';
+            const qrSize = card.cardConfig.qrSize || 120;
+            const position = card.cardConfig.qrPosition || 'top-right';
             
             let qrX, qrY;
             const margin = 30;
@@ -519,7 +519,7 @@ const RegisterClient = () => {
               // Fallback: télécharger l'image sans QR code
               const link = document.createElement('a');
               link.download = 'carte-visite-numerique.png';
-              link.href = businessCard.cardImage;
+              link.href = card.cardImage;
               link.click();
               
               setExecutionStatus(prev => [...prev, {
@@ -532,7 +532,7 @@ const RegisterClient = () => {
             // Télécharger l'image sans QR code
             const link = document.createElement('a');
             link.download = 'carte-visite-numerique.png';
-            link.href = businessCard.cardImage;
+            link.href = card.cardImage;
             link.click();
             
             setExecutionStatus(prev => [...prev, {
@@ -548,7 +548,7 @@ const RegisterClient = () => {
           // Fallback: télécharger l'image brute
           const link = document.createElement('a');
           link.download = 'carte-visite-numerique.png';
-          link.href = businessCard.cardImage;
+          link.href = card.cardImage;
           link.click();
           
           setExecutionStatus(prev => [...prev, {
@@ -558,7 +558,7 @@ const RegisterClient = () => {
           }]);
         };
         
-        img.src = businessCard.cardImage;
+        img.src = card.cardImage;
       } else {
         // Fallback sur une image par défaut
         const link = document.createElement('a');
@@ -593,7 +593,7 @@ const RegisterClient = () => {
   const handleManualDownload = async () => {
     const downloadAction = businessCard?.cardConfig?.actions?.find(action => action.type === 'download');
     if (downloadAction) {
-      await handleDownloadAction(downloadAction);
+      await handleDownloadAction(downloadAction, businessCard);
     } else {
       // Téléchargement direct de la carte si aucune action de téléchargement n'est configurée
       try {
