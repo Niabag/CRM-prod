@@ -1,5 +1,17 @@
 const Devis = require("../models/devis");
 
+const calculateTotalTTC = (articles = []) => {
+  if (!Array.isArray(articles)) return 0;
+  return articles.reduce((total, item) => {
+    const price = parseFloat(item.unitPrice || 0);
+    const qty = parseFloat(item.quantity || 0);
+    const tva = parseFloat(item.tvaRate || 0);
+    if (isNaN(price) || isNaN(qty) || isNaN(tva)) return total;
+    const ht = price * qty;
+    return total + ht + (ht * tva / 100);
+  }, 0);
+};
+
 exports.createDevis = async (req, res) => {
   try {
     const {
@@ -26,10 +38,12 @@ exports.createDevis = async (req, res) => {
       return res.status(400).json({ message: "Client manquant." });
     }
 
+    const computedAmount = calculateTotalTTC(articles);
+
     const newDevis = new Devis({
       title,
       description,
-      amount,
+      amount: computedAmount,
       clientId,
       userId,
       dateDevis,
@@ -59,7 +73,7 @@ exports.createDevis = async (req, res) => {
         category: "nouveau_devis",
         title: "Nouveau devis créé",
         message: `Devis "${title}" créé pour ${client?.name || 'Client inconnu'}`,
-        details: `Montant: ${amount} € • Statut: Nouveau`,
+        details: `Montant: ${computedAmount} € • Statut: Nouveau`,
         date: new Date(),
         read: false,
         devisId: newDevis._id,
@@ -125,9 +139,14 @@ exports.updateDevis = async (req, res) => {
       return res.status(404).json({ message: "Devis introuvable ou non autorisé." });
     }
 
+    const updateData = { ...req.body };
+    if (req.body.articles) {
+      updateData.amount = calculateTotalTTC(req.body.articles);
+    }
+
     const updatedDevis = await Devis.findByIdAndUpdate(
       devisId,
-      req.body,
+      updateData,
       { new: true }
     );
 
