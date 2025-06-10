@@ -52,7 +52,8 @@ exports.register = async (req, res) => {
       user: {
         id: newUser._id,
         name: newUser.name,
-        email: newUser.email
+        email: newUser.email,
+        profileImage: newUser.profileImage
       }
     });
   } catch (error) {
@@ -94,13 +95,14 @@ exports.login = async (req, res) => {
     );
 
     console.log("✅ Connexion réussie pour:", user.email);
-    res.status(200).json({ 
-      userId: user._id, 
+    res.status(200).json({
+      userId: user._id,
       token,
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        profileImage: user.profileImage
       }
     });
   } catch (error) {
@@ -125,6 +127,7 @@ exports.getUser = async (req, res) => {
       userId: user._id,
       name: user.name,
       email: user.email,
+      profileImage: user.profileImage,
     });
   } catch (error) {
     console.error("❌ Erreur lors de la récupération de l'utilisateur:", error);
@@ -236,5 +239,40 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ 
       message: "Erreur lors du changement de mot de passe" 
     });
+  }
+};
+
+exports.updateProfilePicture = async (req, res) => {
+  try {
+    const { profileImage } = req.body;
+    const userId = req.userId;
+
+    if (!profileImage) {
+      return res.status(400).json({
+        message: "Image requise"
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profileImage },
+      { new: true, select: '-password' }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    console.log('✅ Photo de profil mise à jour pour:', updatedUser.email);
+    res.status(200).json({
+      message: 'Photo de profil mise à jour',
+      user: {
+        userId: updatedUser._id,
+        profileImage: updatedUser.profileImage
+      }
+    });
+  } catch (error) {
+    console.error('❌ Erreur lors de la mise à jour de la photo de profil:', error);
+    res.status(500).json({ message: "Erreur lors de la mise à jour de la photo de profil" });
   }
 };

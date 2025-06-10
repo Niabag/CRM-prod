@@ -374,7 +374,11 @@ const Dashboard = () => {
             
             <div className="user-profile" onClick={toggleUserMenu} ref={userMenuRef}>
               <div className="user-avatar">
-                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                {user.profileImage ? (
+                  <img src={user.profileImage} alt="Profil" />
+                ) : (
+                  user.name ? user.name.charAt(0).toUpperCase() : 'U'
+                )}
               </div>
               <div className="user-info">
                 <span className="user-name">{user.name || "Utilisateur"}</span>
@@ -385,7 +389,11 @@ const Dashboard = () => {
               <div className={`user-menu ${isUserMenuOpen ? 'active' : ''}`}>
                 <div className="user-menu-header">
                   <div className="menu-avatar">
-                    {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                    {user.profileImage ? (
+                      <img src={user.profileImage} alt="Profil" />
+                    ) : (
+                      user.name ? user.name.charAt(0).toUpperCase() : 'U'
+                    )}
                   </div>
                   <h3 className="menu-user-name">{user.name || "Utilisateur"}</h3>
                   <p className="menu-user-email">{user.email || ""}</p>
