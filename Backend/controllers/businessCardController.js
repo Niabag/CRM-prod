@@ -354,38 +354,37 @@ const trackCardView = async (req, res) => {
     
     console.log("👁️ Suivi d'une vue de carte pour userId:", userId);
     
-    // Vérifier si la carte existe
-    const businessCard = await BusinessCard.findOne({ userId });
-    
-    if (!businessCard) {
-      return res.status(404).json({ message: "Aucune carte de visite trouvée pour cet utilisateur" });
-    }
-    
-    // Créer les statistiques si elles n'existent pas
-    if (!businessCard.stats) {
-      businessCard.stats = { views: 0, lastViewed: null, viewDates: [] };
-    }
+  // Vérifier si la carte existe
+  const businessCard = await BusinessCard.findOne({ userId });
 
-    const lastViewed = businessCard.stats.lastViewed
+  if (!businessCard) {
+      return res.status(404).json({ message: "Aucune carte de visite trouvée pour cet utilisateur" });
+  }
+
+  // Créer les statistiques si elles n'existent pas
+  if (!businessCard.stats) {
+      businessCard.stats = { views: 0, lastViewed: null, viewDates: [] };
+      await businessCard.save();
+  }
+
+  const lastViewed = businessCard.stats.lastViewed
       ? new Date(businessCard.stats.lastViewed)
       : null;
-    const isDuplicate = lastViewed && (now - lastViewed < 30000); // 30s
+  const isDuplicate = lastViewed && (now - lastViewed < 30000); // 30s
 
-    if (!isDuplicate) {
-      businessCard.stats.views = (businessCard.stats.views || 0) + 1;
+  const update = { $set: { 'stats.lastViewed': now } };
+  if (!isDuplicate) {
+    update.$inc = { 'stats.views': 1 };
+    update.$push = { 'stats.viewDates': now };
+  }
 
-      if (!Array.isArray(businessCard.stats.viewDates)) {
-        businessCard.stats.viewDates = [];
-      }
+  const updatedCard = await BusinessCard.findOneAndUpdate(
+    { userId },
+    update,
+    { new: true }
+  );
 
-      businessCard.stats.viewDates.push(now);
-    }
-
-    businessCard.stats.lastViewed = now;
-    
-    await businessCard.save();
-    
-    console.log("✅ Vue de carte enregistrée, total:", businessCard.stats.views);
+  console.log("✅ Vue de carte enregistrée, total:", updatedCard.stats.views);
     
     // ✅ NOUVEAU: Envoyer une notification en temps réel
     const io = req.app.get("io");
@@ -403,9 +402,9 @@ const trackCardView = async (req, res) => {
       console.log(`✅ Notification de scan de carte envoyée à l'utilisateur ${userId}`);
     }
     
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Vue enregistrée avec succès",
-      views: businessCard.stats.views
+      views: updatedCard.stats.views
     });
     
   } catch (error) {
