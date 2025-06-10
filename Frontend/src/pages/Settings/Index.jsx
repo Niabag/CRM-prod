@@ -304,13 +304,15 @@ const Settings = () => {
               </button>
             )}
 
-            <button
-              onClick={handleManageSubscription}
-              className="manage-subscription-btn"
-              disabled={processingSubscription}
-            >
-              {processingSubscription ? 'Chargement...' : 'Gérer mon abonnement'}
-            </button>
+            {subscription && subscription.status === SUBSCRIPTION_STATUS.ACTIVE && (
+              <button
+                onClick={handleManageSubscription}
+                className="manage-subscription-btn"
+                disabled={processingSubscription}
+              >
+                {processingSubscription ? 'Chargement...' : 'Gérer mon abonnement'}
+              </button>
+            )}
           </div>
         </section>
 
