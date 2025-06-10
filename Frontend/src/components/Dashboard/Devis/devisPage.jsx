@@ -129,7 +129,8 @@ const Devis = ({ clients = [], initialDevisFromClient = null, onBack, selectedCl
       
       const devisData = {
         ...updatedDevis,
-        clientId: clientId
+        clientId: clientId,
+        amount: calculateTTC(updatedDevis)
       };
       
       await apiRequest(url, {
