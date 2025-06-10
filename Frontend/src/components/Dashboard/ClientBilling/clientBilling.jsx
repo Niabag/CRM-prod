@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS, apiRequest } from '../../../config/api';
 import DynamicInvoice from '../Billing/DynamicInvoice';
@@ -10,6 +10,7 @@ const ClientBilling = ({ client, onBack }) => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDevis, setSelectedDevis] = useState(null);
+  const invoicePreviewRef = useRef(null);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
     totalDevis: 0,
@@ -103,6 +104,15 @@ const ClientBilling = ({ client, onBack }) => {
   const handleCreateInvoice = (devis) => {
     setSelectedDevis(devis);
   };
+
+  // Scroll to invoice creation when a devis is selected
+  useEffect(() => {
+    if (selectedDevis && invoicePreviewRef.current) {
+      setTimeout(() => {
+        invoicePreviewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [selectedDevis]);
 
   const handleSaveInvoice = (invoice) => {
     // Ici, vous implémenteriez la sauvegarde réelle de la facture
@@ -741,7 +751,7 @@ const ClientBilling = ({ client, onBack }) => {
 
       {/* Affichage de la facture directement dans la page */}
       {selectedDevis && (
-        <div className="invoice-preview-section">
+        <div className="invoice-preview-section" ref={invoicePreviewRef}>
           <div className="section-header">
             <h3>Création de facture</h3>
             <p>Basée sur le devis: {selectedDevis.title}</p>
