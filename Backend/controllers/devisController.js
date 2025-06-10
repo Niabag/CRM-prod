@@ -206,26 +206,28 @@ exports.updateDevisStatus = async (req, res) => {
 
     console.log(`✅ Statut du devis ${devis.title} mis à jour: ${status}`);
     
-    // ✅ NOUVEAU: Envoyer une notification en temps réel
+    // ✅ NOUVEAU: Envoyer une notification en temps réel après un délai
     const io = req.app.get("io");
     if (io) {
       // Récupérer les infos du client
       const Client = require("../models/client");
       const client = await Client.findById(devis.clientId);
-      
-      io.to(`user-${req.userId}`).emit("notification", {
-        type: "devis",
-        category: "devis_status",
-        title: "Statut de devis modifié",
-        message: `Le devis "${devis.title}" est maintenant "${status}"`,
-        details: `Client: ${client?.name || 'Inconnu'} • Montant: ${devis.amount} €`,
-        date: new Date(),
-        read: false,
-        devisId: devis._id,
-        devisTitle: devis.title,
-        clientName: client?.name
-      });
-      console.log(`✅ Notification de changement de statut de devis envoyée à l'utilisateur ${req.userId}`);
+
+      setTimeout(() => {
+        io.to(`user-${req.userId}`).emit("notification", {
+          type: "devis",
+          category: "devis_status",
+          title: "Statut de devis modifié",
+          message: `Le devis "${devis.title}" est maintenant "${status}"`,
+          details: `Client: ${client?.name || 'Inconnu'} • Montant: ${devis.amount} €`,
+          date: new Date(),
+          read: false,
+          devisId: devis._id,
+          devisTitle: devis.title,
+          clientName: client?.name
+        });
+        console.log(`✅ Notification de changement de statut de devis envoyée à l'utilisateur ${req.userId} (après délai)`);
+      }, 10000); // 10 secondes
     }
     
     res.json({ 
