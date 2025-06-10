@@ -48,6 +48,10 @@ const UserSchema = new mongoose.Schema({
   hasHadTrial: {
     type: Boolean,
     default: false
+  },
+  profileImage: {
+    type: String,
+    default: ''
   }
 });
 

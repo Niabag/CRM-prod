@@ -1,10 +1,11 @@
 const express = require("express");
-const { 
-  register, 
-  login, 
-  getUser, 
-  updateProfile, 
-  changePassword 
+const {
+  register,
+  login,
+  getUser,
+  updateProfile,
+  changePassword,
+  updateProfilePicture
 } = require("../controllers/userController");
 const authenticate = require("../middleware/auth");
 
@@ -24,5 +25,8 @@ router.put("/profile", authenticate, updateProfile);
 
 // Route protégée pour changer le mot de passe
 router.put("/password", authenticate, changePassword);
+
+// Route protégée pour changer la photo de profil
+router.put("/profile-picture", authenticate, updateProfilePicture);
 
 module.exports = router;
