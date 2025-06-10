@@ -28,7 +28,8 @@ const devisSchema = new mongoose.Schema({
       description: String,
       unitPrice: Number,
       quantity: Number,
-      unit: String
+      unit: String,
+      tvaRate: { type: Number, default: 20 }
     }
   ]
 });
