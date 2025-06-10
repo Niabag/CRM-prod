@@ -222,9 +222,9 @@ const RegisterUser = () => {
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowPassword(!showPassword)}
-                    title={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    title={showPassword ? "Masquer" : "Afficher"}
                   >
-                    {showPassword ? "👁️" : "👁️‍🗨️"}
+                    {showPassword ? "👁" : "🙈"}
                   </button>
                 </div>
                 {formData.password && (
@@ -269,9 +269,9 @@ const RegisterUser = () => {
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    title={showConfirmPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    title={showConfirmPassword ? "Masquer" : "Afficher"}
                   >
-                    {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                    {showConfirmPassword ? "👁" : "🙈"}
                   </button>
                 </div>
                 {formData.confirmPassword && formData.password !== formData.confirmPassword && (

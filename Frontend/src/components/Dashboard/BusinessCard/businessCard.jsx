@@ -774,11 +774,12 @@ const BusinessCard = ({ userId, user }) => {
             </div>
             
             <div className="modal-footer">
-              <button 
+              <button
                 onClick={() => setShowSchemasModal(false)}
                 className="btn-cancel"
+                title="Annuler"
               >
-                Annuler
+                ✕
               </button>
             </div>
           </div>

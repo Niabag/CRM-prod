@@ -430,12 +430,13 @@ const ProspectEditPage = ({ prospect, onBack, onSave }) => {
 
           {/* Actions */}
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={onBack || (() => navigate(-1))}
               className="btn-cancel"
+              title="Annuler"
             >
-              Annuler
+              ✕
             </button>
             
             <button 

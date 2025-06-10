@@ -130,8 +130,8 @@ const InvoicePreview = ({ invoice, client, devisDetails = [], onSave, onCancel }
         <button onClick={handleSave} className="toolbar-btn save-btn">
           💾 Enregistrer
         </button>
-        <button onClick={onCancel} className="toolbar-btn cancel-btn">
-          ✕ Annuler
+        <button onClick={onCancel} className="toolbar-btn cancel-btn" title="Annuler">
+          ✕
         </button>
       </div>
 
