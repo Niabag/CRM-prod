@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import DevisPreview from "./devisPreview";
+import DevisCard from "./DevisCard";
 import { API_ENDPOINTS, apiRequest } from "../../../config/api";
 import { DEFAULT_DEVIS } from "./constants";
 import "./devis.scss";
+import { calculateTTC } from "../../../utils/calculateTTC";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
@@ -13,20 +15,6 @@ const formatDate = (dateStr) => {
   }
 };
 
-const calculateTTC = (devis) => {
-  if (!devis || !Array.isArray(devis.articles)) return 0;
-  
-  return devis.articles.reduce((total, article) => {
-    const price = parseFloat(article.unitPrice || 0);
-    const qty = parseFloat(article.quantity || 0);
-    const tva = parseFloat(article.tvaRate || 0);
-    
-    if (isNaN(price) || isNaN(qty) || isNaN(tva)) return total;
-    
-    const ht = price * qty;
-    return total + ht + (ht * tva / 100);
-  }, 0);
-};
 
 const Devis = ({ clients = [], initialDevisFromClient = null, onBack, selectedClientId = null }) => {
   const normalizeClientId = (c) => {
@@ -577,45 +565,16 @@ const Devis = ({ clients = [], initialDevisFromClient = null, onBack, selectedCl
           <div className="devis-grid">
             {filteredDevisList
               .filter((devis) => devis.title && devis.title.trim() !== "")
-              .map((devis) => {
-                const ttc = calculateTTC(devis);
-                
-                return (
-                  <div key={devis._id} className="devis-card">
-                    <div className="devis-card-header">
-                      <h3 className="devis-card-title">{devis.title}</h3>
-                      <div className="devis-card-meta">
-                        <span>📅 {formatDate(devis.dateDevis)}</span>
-                        <span className="devis-card-amount">
-                          💰 {ttc.toFixed(2)} € TTC
-                        </span>
-                      </div>
-                    </div>
-                    <div className="devis-card-actions">
-                      <button 
-                        className="card-btn card-btn-edit"
-                        onClick={() => handleSelectDevis(devis)}
-                      >
-                        ✏️ Modifier
-                      </button>
-                      <button 
-                        className="card-btn card-btn-pdf"
-                        onClick={() => handleDownloadPDF(devis)}
-                        disabled={loading}
-                      >
-                        {loading ? "⏳" : "📄"} PDF
-                      </button>
-                      <button 
-                        className="card-btn card-btn-delete"
-                        onClick={() => handleDelete(devis._id)}
-                        title="Supprimer"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+              .map((devis) => (
+                <DevisCard
+                  key={devis._id}
+                  devis={devis}
+                  onEdit={() => handleSelectDevis(devis)}
+                  onPdf={() => handleDownloadPDF(devis)}
+                  onDelete={handleDelete}
+                  loading={loading}
+                />
+              ))}
           </div>
         )}
       </div>

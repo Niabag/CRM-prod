@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS, apiRequest } from '../../../config/api';
 import DynamicInvoice from '../Billing/DynamicInvoice';
 import './clientBilling.scss';
+import { calculateTTC } from '../../../utils/calculateTTC';
 
 const ClientBilling = ({ client, onBack }) => {
   const navigate = useNavigate();
@@ -85,21 +86,6 @@ const ClientBilling = ({ client, onBack }) => {
     }
   };
 
-  // Fonction correcte pour calculer le TTC d'un devis
-  const calculateTTC = (devis) => {
-    if (!devis || !Array.isArray(devis.articles)) return 0;
-    
-    return devis.articles.reduce((total, article) => {
-      const price = parseFloat(article.unitPrice || 0);
-      const qty = parseFloat(article.quantity || 0);
-      const tva = parseFloat(article.tvaRate || 0);
-      
-      if (isNaN(price) || isNaN(qty) || isNaN(tva)) return total;
-      
-      const ht = price * qty;
-      return total + ht + (ht * tva / 100);
-    }, 0);
-  };
 
   const handleCreateInvoice = (devis) => {
     setSelectedDevis(devis);
