@@ -1,4 +1,5 @@
 import './pricing.scss';
+import { SUBSCRIPTION_PRICE } from '../../services/subscription';
 
 const Pricing = () => (
   <div className="pricing-page">
@@ -12,7 +13,7 @@ const Pricing = () => (
         <div className="pricing-badge">Offre Unique</div>
         <h2 className="pricing-title">Abonnement Pro</h2>
         <div className="pricing-price">
-          <span className="price-amount">13€</span>
+          <span className="price-amount">{SUBSCRIPTION_PRICE}€</span>
           <span className="price-period">/mois</span>
         </div>
         <p className="pricing-description">
@@ -50,7 +51,7 @@ const Pricing = () => (
       <div className="faq-item">
         <h3>Comment fonctionne la facturation ?</h3>
         <p>
-          La facturation est mensuelle à 13€ par mois. Vous pouvez annuler à tout moment 
+          La facturation est mensuelle à {SUBSCRIPTION_PRICE}€ par mois. Vous pouvez annuler à tout moment
           sans engagement ni frais supplémentaires.
         </p>
       </div>
@@ -78,7 +79,7 @@ const Pricing = () => (
       <div className="testimonials-grid">
         <div className="testimonial-card">
           <div className="testimonial-content">
-            <p>"CRM Pro a transformé ma gestion client. Pour seulement 13€ par mois, j'ai tous les outils dont j'ai besoin pour développer mon activité."</p>
+            <p>{`"CRM Pro a transformé ma gestion client. Pour seulement ${SUBSCRIPTION_PRICE}€ par mois, j'ai tous les outils dont j'ai besoin pour développer mon activité."`}</p>
           </div>
           <div className="testimonial-author">
             <div className="author-avatar">M</div>
