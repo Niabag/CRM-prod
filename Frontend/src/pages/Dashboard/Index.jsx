@@ -4,6 +4,7 @@ import Devis from "../../components/Dashboard/Devis/devisPage";
 import DevisListPage from "../../components/Dashboard/Devis/devisListPage";
 import ProspectsPage from "../../components/Dashboard/Prospects/prospectsPage";
 import ProspectEditPage from "../../components/Dashboard/Prospects/prospectEditPage";
+import ProspectCreatePage from "../../components/Dashboard/Prospects/prospectCreatePage";
 import ClientBilling from "../../components/Dashboard/ClientBilling/clientBilling";
 import Analytics from "../../components/Dashboard/Analytics/analytics";
 import Settings from "../../components/Dashboard/Settings/settings";
@@ -129,6 +130,11 @@ const Dashboard = () => {
     setActiveTab("clients");
   };
 
+  const handleCreateProspect = () => {
+    setSelectedProspect(null);
+    setActiveTab("prospect-create");
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -250,6 +256,7 @@ const Dashboard = () => {
       case "carte": return "Carte de Visite";
       case "settings": return "Paramètres";
       case "prospect-edit": return "Modification Prospect";
+      case "prospect-create": return "Nouveau Prospect";
       default: return "CRM Pro";
     }
   };
@@ -265,6 +272,7 @@ const Dashboard = () => {
       case "carte": return "💼";
       case "settings": return "⚙️";
       case "prospect-edit": return "✏️";
+      case "prospect-create": return "➕";
       default: return "📊";
     }
   };
@@ -293,8 +301,9 @@ const Dashboard = () => {
                     activeTab === item.id || 
                     (activeTab === "devis-creation" && item.id === "devis") ||
                     (activeTab === "prospect-edit" && item.id === "clients") ||
+                    (activeTab === "prospect-create" && item.id === "clients") ||
                     (activeTab === "client-billing" && item.id === "devis")
-                      ? "active" 
+                      ? "active"
                       : ""
                   }`}
                   onClick={() => {
@@ -305,7 +314,7 @@ const Dashboard = () => {
                       setSelectedClientForDevis(null);
                       setEditingDevis(null);
                     }
-                    if (item.id !== "clients" && item.id !== "prospect-edit") {
+                    if (item.id !== "clients" && item.id !== "prospect-edit" && item.id !== "prospect-create") {
                       setSelectedProspect(null);
                     }
                     if (item.id !== "client-billing") {
@@ -361,14 +370,14 @@ const Dashboard = () => {
                 🏠 Accueil
               </button>
               
-              <button 
+              <button
                 className="header-btn primary"
                 onClick={() => {
                   if (activeTab === "devis") {
                     handleCreateNewDevis();
                   } else if (activeTab === "clients") {
                     // Ajouter un nouveau prospect
-                    navigate("/register-client/" + userId);
+                    handleCreateProspect();
                   }
                 }}
               >
@@ -427,17 +436,18 @@ const Dashboard = () => {
             {activeTab === "dashboard" && <Analytics />}
 
             {activeTab === "clients" && (
-              <ProspectsPage 
+              <ProspectsPage
                 clients={clients}
                 onRefresh={fetchClients}
                 onViewClientDevis={handleViewClientDevis}
                 onViewClientBilling={handleViewClientBilling}
                 onEditProspect={handleEditProspect}
+                onCreateProspect={handleCreateProspect}
               />
             )}
 
             {activeTab === "prospect-edit" && selectedProspect && (
-              <ProspectEditPage 
+              <ProspectEditPage
                 prospect={selectedProspect}
                 onBack={() => {
                   setSelectedProspect(null);
@@ -446,6 +456,17 @@ const Dashboard = () => {
                 onSave={() => {
                   fetchClients();
                   setSelectedProspect(null);
+                  setActiveTab("clients");
+                }}
+              />
+            )}
+
+            {activeTab === "prospect-create" && (
+              <ProspectCreatePage
+                userId={userId}
+                onBack={() => setActiveTab("clients")}
+                onCreated={() => {
+                  fetchClients();
                   setActiveTab("clients");
                 }}
               />
