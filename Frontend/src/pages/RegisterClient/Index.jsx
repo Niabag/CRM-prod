@@ -398,11 +398,11 @@ const RegisterClient = () => {
       if (action.type === 'download') {
         await handleDownloadAction(action, businessCard);
       } else if (action.type === 'website') {
-        window.open(action.url, '_blank');
+        window.location.href = action.url;
         setExecutionStatus(prev => [...prev, {
           action: 'website',
           status: 'completed',
-          message: 'Site web ouvert dans un nouvel onglet'
+          message: 'Redirection vers le site web'
         }]);
       }
     }
@@ -586,7 +586,7 @@ const RegisterClient = () => {
   const handleManualWebsiteVisit = () => {
     const websiteAction = businessCard?.cardConfig?.actions?.find(action => action.type === 'website');
     if (websiteAction && websiteAction.url) {
-      window.open(websiteAction.url, '_blank');
+      window.location.href = websiteAction.url;
     }
   };
 
