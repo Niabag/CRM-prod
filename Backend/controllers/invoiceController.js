@@ -312,24 +312,25 @@ exports.updateInvoiceStatus = async (req, res) => {
     invoice.status = status;
     await invoice.save();
 
-    // ✅ NOUVEAU: Envoyer une notification en temps réel
+    // ✅ NOUVEAU: Envoyer une notification en temps réel après un délai
     const io = req.app.get("io");
     if (io) {
       const client = await Client.findById(invoice.clientId);
-      
-      io.to(`user-${req.userId}`).emit("notification", {
-        type: "invoice",
-        category: "invoice_status",
-        title: "Statut de facture modifié",
-        message: `La facture ${invoice.invoiceNumber} est maintenant "${getStatusLabel(status)}"`,
-        details: `Client: ${client?.name || 'Inconnu'} • Montant: ${invoice.amount} €`,
-        date: new Date(),
-        read: false,
-        invoiceId: invoice._id,
-        invoiceNumber: invoice.invoiceNumber,
-        clientName: client?.name
-      });
-      console.log(`✅ Notification de changement de statut de facture envoyée à l'utilisateur ${req.userId}`);
+      setTimeout(() => {
+        io.to(`user-${req.userId}`).emit("notification", {
+          type: "invoice",
+          category: "invoice_status",
+          title: "Statut de facture modifié",
+          message: `La facture ${invoice.invoiceNumber} est maintenant "${getStatusLabel(status)}"`,
+          details: `Client: ${client?.name || 'Inconnu'} • Montant: ${invoice.amount} €`,
+          date: new Date(),
+          read: false,
+          invoiceId: invoice._id,
+          invoiceNumber: invoice.invoiceNumber,
+          clientName: client?.name
+        });
+        console.log(`✅ Notification de changement de statut de facture envoyée à l'utilisateur ${req.userId} (après délai)`);
+      }, 10000); // 10 secondes
     }
 
     res.json({ 

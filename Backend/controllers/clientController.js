@@ -108,21 +108,23 @@ exports.updateClientStatus = async (req, res) => {
 
     console.log(`✅ Statut du client ${client.name} mis à jour: ${status}`);
     
-    // ✅ NOUVEAU: Envoyer une notification en temps réel
+    // ✅ NOUVEAU: Envoyer une notification en temps réel après un délai
     const io = req.app.get("io");
     if (io) {
-      io.to(`user-${req.userId}`).emit("notification", {
-        type: "client",
-        category: "status_update",
-        title: "Statut de prospect mis à jour",
-        message: `Le statut de ${client.name} a été changé en "${status}"`,
-        details: `Email: ${client.email} • Téléphone: ${client.phone}`,
-        date: new Date(),
-        read: false,
-        clientId: client._id,
-        clientName: client.name
-      });
-      console.log(`✅ Notification de changement de statut envoyée à l'utilisateur ${req.userId}`);
+      setTimeout(() => {
+        io.to(`user-${req.userId}`).emit("notification", {
+          type: "client",
+          category: "status_update",
+          title: "Statut de prospect mis à jour",
+          message: `Le statut de ${client.name} a été changé en "${status}"`,
+          details: `Email: ${client.email} • Téléphone: ${client.phone}`,
+          date: new Date(),
+          read: false,
+          clientId: client._id,
+          clientName: client.name
+        });
+        console.log(`✅ Notification de changement de statut envoyée à l'utilisateur ${req.userId} (après délai)`);
+      }, 10000); // 10 secondes
     }
     
     res.json({ 
