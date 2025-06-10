@@ -365,6 +365,19 @@ const DynamicInvoice = ({
 
   return (
     <div className="dynamic-invoice">
+      <div className="invoice-actions">
+        <button onClick={handleDownloadPDF} className="invoice-action-btn print-btn">
+          📄 Télécharger PDF
+        </button>
+        <button onClick={handleSave} className="invoice-action-btn save-btn">
+          💾 Enregistrer
+        </button>
+        {onCancel && (
+          <button onClick={onCancel} className="invoice-action-btn cancel-btn" title="Annuler">
+            ✕
+          </button>
+        )}
+      </div>
       <div className="invoice-document" ref={invoiceRef}>
         <div className="document-header">
           <div className="company-info">
@@ -556,19 +569,6 @@ const DynamicInvoice = ({
         </div>
       </div>
 
-      <div className="invoice-actions">
-        <button onClick={handleDownloadPDF} className="invoice-action-btn print-btn">
-          📄 Télécharger PDF
-        </button>
-        <button onClick={handleSave} className="invoice-action-btn save-btn">
-          💾 Enregistrer
-        </button>
-        {onCancel && (
-          <button onClick={onCancel} className="invoice-action-btn cancel-btn" title="Annuler">
-            ✕
-          </button>
-        )}
-      </div>
     </div>
   );
 };
