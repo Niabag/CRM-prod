@@ -810,27 +810,6 @@ const DevisListPage = ({ clients = [], onEditDevis, onCreateDevis }) => {
             })}
           </div>
 
-          {/* Prévisualisation de facture */}
-          {selectedDevisForInvoice && (
-            <div className="invoice-preview-section" ref={invoicePreviewRef}>
-              <DynamicInvoice
-                invoice={{
-                  invoiceNumber: `FACT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-                  dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                  createdAt: new Date().toISOString().split('T')[0],
-                  devisIds: [selectedDevisForInvoice._id]
-                }}
-                client={selectedClient}
-                devisDetails={[selectedDevisForInvoice]}
-                onSave={handleSaveInvoice}
-                onCancel={() => {
-                  setSelectedDevisForInvoice(null);
-                  setSelectedClient(null);
-                }}
-              />
-            </div>
-          )}
-
           {/* Contrôles de pagination */}
           {totalPages > 1 && (
             <div className="pagination-controls">
@@ -899,6 +878,27 @@ const DevisListPage = ({ clients = [], onEditDevis, onCreateDevis }) => {
                   Page {currentPage} sur {totalPages} • {filteredDevis.length} devis au total
                 </span>
               </div>
+            </div>
+          )}
+
+          {/* Prévisualisation de facture */}
+          {selectedDevisForInvoice && (
+            <div className="invoice-preview-section" ref={invoicePreviewRef}>
+              <DynamicInvoice
+                invoice={{
+                  invoiceNumber: `FACT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+                  dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                  createdAt: new Date().toISOString().split('T')[0],
+                  devisIds: [selectedDevisForInvoice._id]
+                }}
+                client={selectedClient}
+                devisDetails={[selectedDevisForInvoice]}
+                onSave={handleSaveInvoice}
+                onCancel={() => {
+                  setSelectedDevisForInvoice(null);
+                  setSelectedClient(null);
+                }}
+              />
             </div>
           )}
         </>
