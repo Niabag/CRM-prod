@@ -227,6 +227,14 @@
   font-style: italic;
 }
 
+.profile-preview {
+  margin-top: 0.5rem;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .app-info {
   background: #f8fafc;
   padding: 16px;
